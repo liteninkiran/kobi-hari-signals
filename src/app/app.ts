@@ -1,10 +1,24 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core';
 
+// Since zone.js isn't installed, we cannot use provideZoneChangeDetection() in app.config.ts.
+// Therefore, we must rely on markForCheck() or use signals to notify Angular of changes made
+// inside setInterval().
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [],
   templateUrl: './app.html',
   styleUrl: './app.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class App {}
+export class App {
+  private readonly cdr = inject(ChangeDetectorRef);
+  counter = 0;
+
+  constructor() {
+    setInterval(() => {
+      this.counter++;
+      this.cdr.markForCheck();
+      console.log('Counter:', this.counter);
+    }, 500);
+  }
+}
