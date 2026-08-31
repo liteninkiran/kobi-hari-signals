@@ -17,8 +17,10 @@ export class App {
   constructor() {
     setInterval(() => {
       this.counter++;
-      this.cdr.markForCheck();
+      // this.cdr.markForCheck();
       console.log('Counter:', this.counter);
     }, 500);
   }
+
+  doNothing() {}
 }
