@@ -2,13 +2,13 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@
 
 // Since zone.js isn't installed, we cannot use provideZoneChangeDetection() in app.config.ts.
 // Therefore, we must rely on markForCheck() or use signals to notify Angular of changes made
-// inside setInterval().
+// inside setInterval(), even when using the Eager strategy.
 @Component({
   selector: 'app-root',
   imports: [],
   templateUrl: './app.html',
   styleUrl: './app.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class App {
   private readonly cdr = inject(ChangeDetectorRef);
@@ -17,10 +17,15 @@ export class App {
   constructor() {
     setInterval(() => {
       this.counter++;
-      // this.cdr.markForCheck();
+      this.cdr.markForCheck();
       console.log('Counter:', this.counter);
     }, 500);
   }
 
   doNothing() {}
+
+  calculateValue() {
+    console.log('Calculating Value');
+    return 42;
+  }
 }
