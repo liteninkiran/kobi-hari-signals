@@ -1,10 +1,21 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { interval } from 'rxjs';
+import { BehaviorSubject, combineLatest, debounceTime, map } from 'rxjs';
 
-// Since zone.js isn't installed, we cannot use provideZoneChangeDetection() in app.config.ts.
-// Therefore, we must rely on markForCheck() or use signals to notify Angular of changes made
-// inside setInterval(), even when using the Eager strategy.
+type Options = Record<string, string>;
+
+const initialOptions: Options = {
+  r: 'Red',
+  g: 'Green',
+  b: 'Blue',
+};
+
+const secondaryOptions: Options = {
+  m: 'Magenta',
+  y: 'Yellow',
+  c: 'Cyan',
+};
+
 @Component({
   selector: 'app-root',
   imports: [CommonModule],
@@ -13,10 +24,19 @@ import { interval } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class App {
-  readonly counter$ = interval(1000);
+  readonly options$ = new BehaviorSubject<Options>(initialOptions);
+  readonly selectedKey$ = new BehaviorSubject<string>('b');
+  readonly selectedValue$ = combineLatest([this.options$, this.selectedKey$]).pipe(
+    debounceTime(0),
+    map(([options, key]) => options[key]),
+  );
 
-  calculateValue() {
-    console.log('Calculating Value');
-    return 42;
+  constructor() {
+    this.selectedValue$.subscribe(console.log);
+  }
+
+  switchOptions() {
+    this.options$.next(secondaryOptions);
+    this.selectedKey$.next('c');
   }
 }
