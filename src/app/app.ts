@@ -1,28 +1,19 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { interval } from 'rxjs';
 
 // Since zone.js isn't installed, we cannot use provideZoneChangeDetection() in app.config.ts.
 // Therefore, we must rely on markForCheck() or use signals to notify Angular of changes made
 // inside setInterval(), even when using the Eager strategy.
 @Component({
   selector: 'app-root',
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './app.html',
   styleUrl: './app.scss',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class App {
-  private readonly cdr = inject(ChangeDetectorRef);
-  counter = 0;
-
-  constructor() {
-    setInterval(() => {
-      this.counter++;
-      this.cdr.markForCheck();
-      console.log('Counter:', this.counter);
-    }, 500);
-  }
-
-  doNothing() {}
+  readonly counter$ = interval(1000);
 
   calculateValue() {
     console.log('Calculating Value');
