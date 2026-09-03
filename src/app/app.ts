@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { mySignal } from './my-signal';
 
 @Component({
@@ -11,8 +11,10 @@ import { mySignal } from './my-signal';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class App {
-  readonly firstSignal = mySignal(42);
-  readonly secondSignal = mySignal('Signals');
+  readonly firstSignal = signal(42);
+  readonly secondSignal = signal('Signals');
+  readonly thirdSignal = signal(10);
+  readonly derived = computed(() => this.firstSignal() + this.thirdSignal());
 
   constructor() {
     console.log('The first signal value is:', this.firstSignal());
