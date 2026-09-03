@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, signal } from '@angular/core';
+import { Component, linkedSignal, signal } from '@angular/core';
 import { PRODUCTS } from './products';
 
 @Component({
@@ -11,19 +11,16 @@ import { PRODUCTS } from './products';
 export class App {
   readonly products = signal(['Apple', 'Banana', 'Cherry']);
 
-  readonly selectedProduct = signal('Apple');
-
-  /*
-    1. Create a simple linked signal that sets the selected product to the first
-       product in the list, when the inventory changes.
-
-    2. Change the `linkedSignal` so you use the second signature, supply an object 
-       with source and computation properties.
-
-    3. In the computation, use the previous value, to check if the selected product 
-       is still in the list, if not, set the selected product to the first product 
-       in the list.
-  */
+  readonly selectedProduct = linkedSignal<string[], string>({
+    source: this.products,
+    computation: (prod, prev) => {
+      console.log('prod', prod);
+      console.log('prev', prev);
+      if (!prev) return prod[0];
+      if (prod.includes(prev.value)) return prev.value;
+      return prod[0];
+    },
+  });
 
   addProduct() {
     this.products.update((prods) => [...prods, PRODUCTS[prods.length]]);
