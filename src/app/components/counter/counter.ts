@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { interval } from 'rxjs';
+import { startCounting } from '../../util';
 
 @Component({
   selector: 'app-counter',
@@ -10,6 +10,6 @@ import { interval } from 'rxjs';
 })
 export class Counter {
   constructor() {
-    interval(1000).subscribe(console.log);
+    startCounting();
   }
 }
