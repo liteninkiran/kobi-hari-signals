@@ -1,4 +1,12 @@
-import { Component, effect, EffectRef, inject, Injector, signal } from '@angular/core';
+import {
+  Component,
+  CreateEffectOptions,
+  effect,
+  EffectRef,
+  inject,
+  Injector,
+  signal,
+} from '@angular/core';
 
 @Component({
   selector: 'app-counter',
@@ -20,22 +28,18 @@ export class Counter {
   }
 
   go() {
-    if (this.ef) {
-      return;
-    }
-
-    this.ef = effect(
-      () => {
-        console.log(this.value());
-      },
-      {
-        injector: this.injector,
-      },
-    );
+    if (this.ef) return;
+    const effectFn = () => {
+      console.log(this.value());
+    };
+    const options: CreateEffectOptions = { injector: this.injector };
+    this.ef = effect(effectFn, options);
   }
 
   stop() {
-    this.ef?.destroy();
-    this.ef = null;
+    if (this.ef) {
+      this.ef.destroy();
+      this.ef = null;
+    }
   }
 }
