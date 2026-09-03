@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, signal } from '@angular/core';
 import { mySignal } from './my-signal';
 
 @Component({
@@ -17,12 +17,15 @@ export class App {
   readonly derived = computed(() => this.firstSignal() + this.thirdSignal());
 
   constructor() {
-    console.log('The first signal value is:', this.firstSignal());
-    console.log('The second signal value is:', this.secondSignal());
+    effect(() => {
+      console.log('The first signal value is:', this.firstSignal());
+      console.log('The second signal value is:', this.secondSignal());
+    });
   }
 
   setSignal() {
     this.firstSignal.set(10);
+    this.secondSignal.set('Hello');
   }
 
   updateSignal() {
