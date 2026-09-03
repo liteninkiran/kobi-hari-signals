@@ -1,5 +1,4 @@
-import { Component, DestroyRef, inject, Injector, runInInjectionContext } from '@angular/core';
-import { startCounting } from '../../util';
+import { Component, effect, EffectRef, inject, Injector, signal } from '@angular/core';
 
 @Component({
   selector: 'app-counter',
@@ -9,17 +8,34 @@ import { startCounting } from '../../util';
   styleUrl: './counter.scss',
 })
 export class Counter {
-  private dr = inject(DestroyRef);
-  private injector = inject(Injector);
+  readonly value = signal(0);
+  readonly injector = inject(Injector);
+
+  ef: EffectRef | null = null;
 
   constructor() {
-    // startCounting();
+    const int = setInterval(() => {
+      this.value.update((v) => v + 1);
+    }, 100);
   }
 
-  ngOnInit() {
-    // startCounting(this.dr);
-    runInInjectionContext(this.injector, () => {
-      startCounting();
-    });
+  go() {
+    if (this.ef) {
+      return;
+    }
+
+    this.ef = effect(
+      () => {
+        console.log(this.value());
+      },
+      {
+        injector: this.injector,
+      },
+    );
+  }
+
+  stop() {
+    this.ef?.destroy();
+    this.ef = null;
   }
 }
