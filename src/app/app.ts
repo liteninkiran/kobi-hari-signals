@@ -1,34 +1,49 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, signal } from '@angular/core';
-import { mySignal } from './my-signal';
+import { Component, signal } from '@angular/core';
+import { PRODUCTS } from './products';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
   imports: [CommonModule],
   templateUrl: './app.html',
   styleUrl: './app.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class App {
-  readonly firstSignal = signal(42);
-  readonly secondSignal = signal('Signals');
-  readonly thirdSignal = signal(10);
-  readonly derived = computed(() => this.firstSignal() + this.thirdSignal());
+  readonly products = signal(['Apple', 'Banana', 'Cherry']);
 
-  constructor() {
-    effect(() => {
-      console.log('The first signal value is:', this.firstSignal());
-      console.log('The second signal value is:', this.secondSignal());
+  readonly selectedProduct = signal('Apple');
+
+  /*
+    1. Create a simple linked signal that sets the selected product to the first
+       product in the list, when the inventory changes.
+
+    2. Change the `linkedSignal` so you use the second signature, supply an object 
+       with source and computation properties.
+
+    3. In the computation, use the previous value, to check if the selected product 
+       is still in the list, if not, set the selected product to the first product 
+       in the list.
+  */
+
+  addProduct() {
+    this.products.update((prods) => [...prods, PRODUCTS[prods.length]]);
+  }
+
+  removeProduct() {
+    this.products.update((prods) => prods.slice(0, -1));
+  }
+
+  nextProduct() {
+    this.selectedProduct.update((selected) => {
+      const index = this.products().indexOf(selected);
+      return this.products()[(index + 1) % this.products().length];
     });
   }
 
-  setSignal() {
-    this.firstSignal.set(10);
-    this.secondSignal.set('Hello');
-  }
-
-  updateSignal() {
-    this.firstSignal.update((value) => value + 1);
+  prevProduct() {
+    this.selectedProduct.update((selected) => {
+      const index = this.products().indexOf(selected);
+      return this.products()[(index - 1 + this.products().length) % this.products().length];
+    });
   }
 }
